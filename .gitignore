@@ -3,4 +3,5 @@ venv/*
 MyRuns.egg-info/
 user_token.db
 .idea/
+MyRuns/__pycache__/*
 
