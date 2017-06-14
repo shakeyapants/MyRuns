@@ -1,13 +1,17 @@
 import click
 import MyRuns
-from .version import __version__
+
+with open('VERSION') as version_file:
+    version_num = version_file.read().strip()
 
 
-@click.command(name='MyRuns')
-@click.version_option(__version__, '--version', '-V')
-@click.option('--setup', '-S', is_flag=True, help='Create database tables.')
-def cli(setup):
-    if setup:
+@click.command()
+@click.option('--version', '-V', is_flag=True, help='Will print version.')
+@click.option('--setup', '-S', is_flag=True, help='Will create database tables.')
+def cli(version, setup):
+    if version:
+        click.echo('MyRuns version {}'.format(version_num))
+    elif setup:
         with MyRuns.MyRuns.app.app_context():
             MyRuns.MyRuns.db.create_all()
             MyRuns.MyRuns.db.session.commit()

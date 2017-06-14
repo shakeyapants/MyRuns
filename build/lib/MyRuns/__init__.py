@@ -1,5 +1,4 @@
 from .MyRuns import app
-from .version import __version__
 import os
 import sys
 
