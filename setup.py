@@ -1,6 +1,5 @@
 from setuptools import setup
 from os import path
-from .MyRuns.version import __version__
 
 here = path.abspath(path.dirname(__file__))
 
