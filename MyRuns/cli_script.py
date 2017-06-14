@@ -1,12 +1,10 @@
 import click
 import MyRuns
-
-with open('VERSION') as version_file:
-    version_num = version_file.read().strip()
+from .version import __version__
 
 
 @click.command(name='MyRuns')
-@click.version_option(version_num, '--version', '-V')
+@click.version_option(__version__, '--version', '-V')
 @click.option('--setup', '-S', is_flag=True, help='Create database tables.')
 def cli(setup):
     if setup:

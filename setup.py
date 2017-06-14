@@ -7,12 +7,10 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
-with open(path.join(here, 'VERSION')) as version_file:
-    version = version_file.read().strip()
-
+exec(open('MyRuns/version.py').read())
 setup(
     name='MyRuns',
-    version=version,
+    version=__version__,
     description='A small web app that connects to Strava and calculates your target for the week',
     long_description=long_description,
     author='Angelina Nikiforova',
