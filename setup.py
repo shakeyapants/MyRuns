@@ -1,8 +1,9 @@
 from setuptools import setup
 from os import path
+from MyRuns.version import __version__
 
 here = path.abspath(path.dirname(__file__))
-from MyRuns.version import __version__
+
 
 # Get the long description from the README file
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
