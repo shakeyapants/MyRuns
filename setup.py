@@ -1,6 +1,5 @@
 from setuptools import setup
 from os import path
-from MyRuns.version import __version__
 
 here = path.abspath(path.dirname(__file__))
 
@@ -9,7 +8,7 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
-
+exec(open(path.join(here, 'MyRuns/version.py')).read())
 setup(
     name='MyRuns',
     version=__version__,
