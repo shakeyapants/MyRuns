@@ -34,8 +34,9 @@ try:
     REDIRECT_URI = config['REDIRECT_URI']
     SECRET_KEY = config['SECRET_KEY']
     DATABASE = db_dic['DB_ADDRESS']
-except FileNotFoundError:
+except (FileNotFoundError, TypeError):
     print('Please create config')
+    sys.exit()
 
 user_token = sqlite3.connect(r'user_token.db')
 

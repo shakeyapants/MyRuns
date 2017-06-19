@@ -1,5 +1,6 @@
 graft MyRuns/templates
 graft MyRuns/static
 include MyRuns/schema.sql
-include MyRuns/API_KEYS.py
+include MyRuns/config.yaml
+include MyRuns/db_address.yaml
 include MyRuns/cli_script.py
