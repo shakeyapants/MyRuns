@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import exists
 from flask_login import LoginManager, UserMixin, login_user
 import sqlite3
+import yaml
 import datetime
 import sys
 import os
@@ -11,7 +12,27 @@ import os
 file_dir = os.path.dirname(__file__)
 sys.path.append(file_dir)
 
-from API_KEYS import *
+here = os.path.dirname(os.path.abspath(__file__))
+
+# reading config files
+with open(os.path.join(here, 'config.yaml'), 'r') as config:
+    try:
+        config = yaml.load(config)
+    except yaml.YAMLError as exc:
+        print(exc)
+
+with open(os.path.join(here, 'db_address.yaml'), 'r') as db_address:
+    try:
+        db_dic = yaml.load(db_address)
+    except yaml.YAMLError as exc:
+        print(exc)
+
+# config
+MY_STRAVA_CLIENT_ID = int(config['MY_STRAVA_CLIENT_ID'])
+MY_STRAVA_SECRET = config['MY_STRAVA_SECRET']
+REDIRECT_URI = config['REDIRECT_URI']
+SECRET_KEY = config['SECRET_KEY']
+DATABASE = db_dic['DB_ADDRESS']
 
 user_token = sqlite3.connect(r'user_token.db')
 

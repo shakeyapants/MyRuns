@@ -4,4 +4,6 @@ MyRuns.egg-info/
 user_token.db
 .idea/
 MyRuns/__pycache__/*
+config.yaml
+db_address.yaml
 
