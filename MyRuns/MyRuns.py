@@ -24,7 +24,7 @@ try:
 
     with open(os.path.join(here, 'db_address.yaml'), 'r') as db_address:
         try:
-            db_dic = yaml.load(db_address)
+            db_address = yaml.load(db_address)
         except yaml.YAMLError as exc:
             print(exc)
 
@@ -33,7 +33,7 @@ try:
     MY_STRAVA_SECRET = config['MY_STRAVA_SECRET']
     REDIRECT_URI = config['REDIRECT_URI']
     SECRET_KEY = config['SECRET_KEY']
-    DATABASE = db_dic['DB_ADDRESS']
+    DATABASE = db_address['DB_ADDRESS']
 except (FileNotFoundError, TypeError):
     print('Please create config')
     sys.exit()
