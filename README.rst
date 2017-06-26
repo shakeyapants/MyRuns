@@ -15,9 +15,9 @@ How to install
 5. Create your SECRET_KEY: it's a string required to use by Flask_login.
 6. Run the following commands:
 
-    MyRuns setup
-
     MyRuns database
+
+    MyRuns setup
 
     MyRuns config (NOTE: here you will be required to enter details gained above)
 
