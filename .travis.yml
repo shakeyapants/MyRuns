@@ -11,7 +11,7 @@ before_script:
   # Allow us to SSH passwordless to localhost
   - echo "before test"
 script:
-  # Normal tests
+  # Base tests
   - MyRuns --help
   - MyRuns --version
 notifications:
@@ -19,6 +19,13 @@ notifications:
     channels: "irc.freenode.org#fabric"
     template:
       - "%{repository}@%{branch}: %{message} (%{build_url})"
-    on_success: change
-    on_failure: change
-  email: false
+    on_success: always
+    on_failure: always
+  email:
+    recipients:
+        - ssmarkin@yandex.ru
+    template:
+      - "%{repository} (%{commit}) : %{message} %{foo} "
+      - "Build details: %{build_url}"
+    on_success: always
+    on_failure: always
