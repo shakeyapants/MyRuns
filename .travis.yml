@@ -1,0 +1,24 @@
+language: python
+python:
+  - "3.5"
+  - "3.6"
+install:
+  # Build/test dependencies
+  - pip install -r requirements.txt
+  # Get fab to test fab
+  - pip install -e .
+before_script:
+  # Allow us to SSH passwordless to localhost
+  - echo "before test"
+script:
+  # Normal tests
+  - MyRuns --help
+  - MyRuns --version
+notifications:
+  irc:
+    channels: "irc.freenode.org#fabric"
+    template:
+      - "%{repository}@%{branch}: %{message} (%{build_url})"
+    on_success: change
+    on_failure: change
+  email: false
