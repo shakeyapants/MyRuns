@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from stravalib.client import Client
 from flask import Flask, redirect, render_template, url_for, request, flash, session
 from flask_sqlalchemy import SQLAlchemy
@@ -8,37 +10,40 @@ import yaml
 import datetime
 import sys
 import os
+from pathlib import Path
 
 file_dir = os.path.dirname(__file__)
 sys.path.append(file_dir)
 
-here = os.path.dirname(os.path.abspath(__file__))
+home = str(Path("%s/%s" % (os.getenv('HOME'), 'MyRuns')))
 
 # reading config files
 try:
-    with open(os.path.join(here, 'config.yaml'), 'r') as config:
-        try:
+    with open(os.path.join(home, 'config.yaml'), 'r') as config:
+        data = yaml.load(config)
+except yaml.YAMLError as exc:
+        print(exc)
+except FileNotFoundError:
+        with open(os.path.join(home, 'config.yaml'), 'w') as config:
+            yaml.dump({'MY_STRAVA_CLIENT_ID': '11111', 'MY_STRAVA_SECRET': 'strava_secret',
+                       'REDIRECT_URI': 'uri', 'SECRET_KEY': 'secret_key'}, config)
+        with open(os.path.join(home, 'config.yaml'), 'r') as config:
             config = yaml.load(config)
-        except yaml.YAMLError as exc:
-            print(exc)
 
-    with open(os.path.join(here, 'db_address.yaml'), 'r') as db_address:
-        try:
-            db_address = yaml.load(db_address)
-        except yaml.YAMLError as exc:
-            print(exc)
+with open(os.path.join(home, 'db_address.yaml'), 'r') as db_address:
+    try:
+        db_address = yaml.load(db_address)
+    except yaml.YAMLError as exc:
+        print(exc)
 
-    # config
-    MY_STRAVA_CLIENT_ID = int(config['MY_STRAVA_CLIENT_ID'])
-    MY_STRAVA_SECRET = config['MY_STRAVA_SECRET']
-    REDIRECT_URI = config['REDIRECT_URI']
-    SECRET_KEY = config['SECRET_KEY']
-    DATABASE = db_address['DB_ADDRESS']
-except (FileNotFoundError, TypeError):
-    print('Please create config')
-    sys.exit()
+# config
+MY_STRAVA_CLIENT_ID = int(data['MY_STRAVA_CLIENT_ID'])
+MY_STRAVA_SECRET = data['MY_STRAVA_SECRET']
+REDIRECT_URI = data['REDIRECT_URI']
+SECRET_KEY = data['SECRET_KEY']
+DATABASE = db_address['DB_ADDRESS']
 
-user_token = sqlite3.connect(r'user_token.db')
+user_token = sqlite3.connect(os.path.join(home, 'user_token.db'))
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
@@ -58,9 +63,11 @@ class User(db.Model, UserMixin):
     access_token = db.Column(db.String(256))
     cookies = db.Column(db.String(256))
 
+
 # setup login manager
 login_manager = LoginManager()
 login_manager.login_view = 'users.login'
+
 
 @login_manager.user_loader
 def load_user(user_token):
@@ -82,6 +89,7 @@ def monday():
     today = datetime.date.today()
     monday_of_current_week = today + datetime.timedelta(days=-today.weekday())
     return monday_of_current_week
+
 
 @app.route('/authorize')
 def authorize():
@@ -165,4 +173,4 @@ if __name__ == "__main__":
             db.session.commit()
             print('Database tables created')
     else:
-        app.run(debug=True, host='0.0.0.0')
+        app.run(host='0.0.0.0')
