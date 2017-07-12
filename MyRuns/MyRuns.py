@@ -6,42 +6,22 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import exists
 from flask_login import LoginManager, UserMixin, login_user
 import sqlite3
-import yaml
 import datetime
 import sys
 import os
-from pathlib import Path
+
 
 file_dir = os.path.dirname(__file__)
 sys.path.append(file_dir)
 
-home = str(Path("%s/%s" % (os.getenv('HOME'), 'MyRuns')))
-
-# reading config files
-try:
-    with open(os.path.join(home, 'config.yaml'), 'r') as config:
-        data = yaml.load(config)
-except yaml.YAMLError as exc:
-        print(exc)
-except FileNotFoundError:
-        with open(os.path.join(home, 'config.yaml'), 'w') as config:
-            yaml.dump({'MY_STRAVA_CLIENT_ID': '11111', 'MY_STRAVA_SECRET': 'strava_secret',
-                       'REDIRECT_URI': 'uri', 'SECRET_KEY': 'secret_key'}, config)
-        with open(os.path.join(home, 'config.yaml'), 'r') as config:
-            config = yaml.load(config)
-
-with open(os.path.join(home, 'db_address.yaml'), 'r') as db_address:
-    try:
-        db_address = yaml.load(db_address)
-    except yaml.YAMLError as exc:
-        print(exc)
+from config_operations import ConfigFile, home
 
 # config
-MY_STRAVA_CLIENT_ID = int(data['MY_STRAVA_CLIENT_ID'])
-MY_STRAVA_SECRET = data['MY_STRAVA_SECRET']
-REDIRECT_URI = data['REDIRECT_URI']
-SECRET_KEY = data['SECRET_KEY']
-DATABASE = db_address['DB_ADDRESS']
+MY_STRAVA_CLIENT_ID = int(ConfigFile(home, 'config.yaml').read_parameter('MY_STRAVA_CLIENT_ID'))
+MY_STRAVA_SECRET = ConfigFile(home, 'config.yaml').read_parameter('MY_STRAVA_SECRET')
+REDIRECT_URI = ConfigFile(home, 'config.yaml').read_parameter('REDIRECT_URI')
+SECRET_KEY = ConfigFile(home, 'config.yaml').read_parameter('SECRET_KEY')
+DATABASE = ConfigFile(home, 'db_address.yaml').read_parameter('DB_ADDRESS')
 
 user_token = sqlite3.connect(os.path.join(home, 'user_token.db'))
 

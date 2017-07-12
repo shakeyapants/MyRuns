@@ -5,12 +5,10 @@ import yaml
 import platform
 from pathlib import Path
 from .version import __version__
+from .config_operations import ConfigFile, PROJECT_NAME
 
 
 place = os.path.dirname(os.path.abspath(__file__))
-
-# folder for files
-PROJECT_NAME = 'MyRuns'
 
 
 # finding directory for project files
@@ -43,19 +41,17 @@ def run():
 @click.option('--REDIRECT_URI', prompt='Your redirect URI')
 @click.option('--SECRET_KEY', prompt='Your secret key')
 def config(my_strava_client_id, my_strava_secret, redirect_uri, secret_key):
-    with open(os.path.join(home, 'config.yaml'), 'w') as f:
-        yaml.dump(({'MY_STRAVA_CLIENT_ID': my_strava_client_id,
-                    'MY_STRAVA_SECRET': my_strava_secret,
-                    'REDIRECT_URI': redirect_uri,
-                    'SECRET_KEY': secret_key}), f)
+    ConfigFile(home, 'config.yaml').write_parameter('MY_STRAVA_CLIENT_ID', my_strava_client_id)
+    ConfigFile(home, 'config.yaml').write_parameter('MY_STRAVA_SECRET', my_strava_secret)
+    ConfigFile(home, 'config.yaml').write_parameter('REDIRECT_URI', redirect_uri)
+    ConfigFile(home, 'config.yaml').write_parameter('SECRET_KEY', secret_key)
     click.echo('config created')
 
 
 @click.command()
 def database():
     open(os.path.join(home, 'user_token.db'), 'a').close()
-    with open(os.path.join(home, 'db_address.yaml'), 'w') as f:
-        yaml.dump(({'DB_ADDRESS': 'sqlite:///{}/user_token.db'.format(home)}), f)
+    ConfigFile(home, 'db_address.yaml').write_parameter('DB_ADDRESS', 'sqlite:///{}/user_token.db'.format(home))
     click.echo('database file created')
 
 

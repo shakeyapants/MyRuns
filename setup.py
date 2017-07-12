@@ -35,7 +35,8 @@ setup(
         'Flask_login>=0.4.0',
         'SQLAlchemy>=1.1.9',
         'Click>=6.7',
-        'pyyaml>=3.12'
+        'pyyaml>=3.12',
+        'pytest>=3.1.3'
     ],
     entry_points='''
             [console_scripts]
