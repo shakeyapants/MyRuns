@@ -17,7 +17,7 @@ sys.path.append(file_dir)
 from config_operations import ConfigFile, home
 
 # config
-MY_STRAVA_CLIENT_ID = int(ConfigFile(home, 'config.yaml').read_parameter('MY_STRAVA_CLIENT_ID'))
+MY_STRAVA_CLIENT_ID = ConfigFile(home, 'config.yaml').read_parameter('MY_STRAVA_CLIENT_ID')
 MY_STRAVA_SECRET = ConfigFile(home, 'config.yaml').read_parameter('MY_STRAVA_SECRET')
 REDIRECT_URI = ConfigFile(home, 'config.yaml').read_parameter('REDIRECT_URI')
 SECRET_KEY = ConfigFile(home, 'config.yaml').read_parameter('SECRET_KEY')
