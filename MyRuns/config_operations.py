@@ -13,6 +13,12 @@ if platform.uname().system == 'Windows':
 elif platform.uname().system == 'Linux' or 'Darwin':
     home = str(Path("%s/%s" % (os.getenv('HOME'), PROJECT_NAME)))
 
+# create home directory
+try:
+    os.mkdir(home)
+except FileExistsError:
+    pass
+
 
 class ConfigFile(object):
     def __init__(self, path_to_config, config_name):
