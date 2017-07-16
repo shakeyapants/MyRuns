@@ -1,6 +1,7 @@
 import pytest
 from MyRuns import *
 
+
 class TestCore:
     def setup_class(self):
         self.username = "gbot"

@@ -12,12 +12,12 @@ before_script:
   - echo "before test"
 script:
   # Base tests
-  - cd test
-  - pytest ./test_myruns.py
   - MyRuns --help
   - MyRuns --version
   - MyRuns database
   - MyRuns setup
+  - cd test
+  - pytest ./test_myruns.py
 notifications:
   irc:
     channels: "irc.freenode.org#fabric"
