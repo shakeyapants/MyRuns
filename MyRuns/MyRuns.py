@@ -17,6 +17,11 @@ sys.path.append(file_dir)
 from config_operations import ConfigFile, home
 
 # config
+##### BLOCK1
+
+# Этот блок следует внести в функцию и вызываться по необходимости, а не во время подключения модуля.
+# Используй глобальные переменные аккуратно.
+# Здесь есть последовательность вызовов, которая влияет на ход программы. Это надо прятать в функцию.
 MY_STRAVA_CLIENT_ID = ConfigFile(home, 'config.yaml').read_parameter('MY_STRAVA_CLIENT_ID')
 MY_STRAVA_SECRET = ConfigFile(home, 'config.yaml').read_parameter('MY_STRAVA_SECRET')
 REDIRECT_URI = ConfigFile(home, 'config.yaml').read_parameter('REDIRECT_URI')
@@ -35,6 +40,7 @@ db = SQLAlchemy(app)
 strava_client = Client()
 access_token = None
 
+##### BLOCK1
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
