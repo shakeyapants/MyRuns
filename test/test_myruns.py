@@ -5,6 +5,7 @@ import tempfile
 import os
 from pathlib import Path
 
+
 class TestCore:
     def setup_class(self):
         self.workdir = tempfile.mkdtemp()
@@ -48,18 +49,19 @@ class TestCore:
 
     def test_read_config(self):
         path_to_config = self.workdir
+        print(path_to_config)
         config_file = "config.yaml"
         config = ConfigFile(path_to_config, config_name=config_file)
         with pytest.raises(FileNotFoundError) as ex:
-            config.read_parameter("SomeFile")
+            config.read_parameter("SomeParameter")
         val = ''
         try:
             val = config.read_parameter("SomeFile", "AnyText")
         except FileNotFoundError as ex:
             config.create()
-            val = config.read_parameter("SomeFile", "AnyText")
+            val = config.read_parameter("SECRET_KEY")
         finally:
-            assert ( val == "AnyText" )
+            assert (val == "AnyText")
 
 
 

@@ -30,25 +30,12 @@ class ConfigFile(object):
             yaml.dump(data, config)
 
     def read_parameter(self, parameter, default=None):
-        try:
-            with open(os.path.join(self._path_config, self.config_name), 'r') as config:
-                try:
-                    config = yaml.load(config)
-                    return config.get(parameter, default)
-                except yaml.YAMLError as exc:
-                    print(exc)
-        except FileNotFoundError:
-            # Функция должна выполнять одну задачу. Данная ошибку следует разруливать
-            # на уровне выше.
-            # FileNotFoundError обработка этого события здесь не уместна. Единственное что можно добавить это запись в логи.
-            # Но чтобы было удобно работать с этим классом, стоит решать проблемы с исключениями в отдельной функции
-            # Например, ReadParameter
-            with open(os.path.join(home, self.config_name), 'w') as config:
-                yaml.dump({'MY_STRAVA_CLIENT_ID': '11111', 'MY_STRAVA_SECRET': 'strava_secret',
-                           'REDIRECT_URI': 'uri', 'SECRET_KEY': 'secret_key'}, config)
-            with open(os.path.join(home, 'config.yaml'), 'r') as config:
-                yaml.load(config)
-            return 'template config created'
+        with open(os.path.join(self._path_config, self.config_name), 'r') as config:
+            try:
+                config = yaml.load(config)
+                return config.get(parameter, default)
+            except yaml.YAMLError as exc:
+                print(exc)
 
     def write_parameter(self, parameter, value):
         try:
@@ -61,3 +48,18 @@ class ConfigFile(object):
             yaml.dump(config, stream, default_flow_style=False)
         return 'parameter updated'
 
+
+class ConfigFileNotFound(FileNotFoundError):
+    if not os.path.isfile(os.path.join(home, 'config.yaml')):
+        print('please create config: myruns config')
+        with open(os.path.join(home, 'config.yaml'), 'w') as config:
+            yaml.dump({'MY_STRAVA_CLIENT_ID': '11111', 'MY_STRAVA_SECRET': 'strava_secret',
+                       'REDIRECT_URI': 'uri', 'SECRET_KEY': 'secret_key'}, config)
+        with open(os.path.join(home, 'config.yaml'), 'r') as config:
+            yaml.load(config)
+    if not os.path.isfile(os.path.join(home, 'db_address.yaml')):
+        print('please create database address: myruns database')
+        with open(os.path.join(home, 'db_address.yaml'), 'w') as config:
+            yaml.dump({'DB_ADDRESS': 'some'}, config)
+        with open(os.path.join(home, 'db_address.yaml'), 'r') as config:
+            yaml.load(config)

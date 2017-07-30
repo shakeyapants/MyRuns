@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-
+from flask_sqlalchemy import SQLAlchemy
 from stravalib.client import Client
 from flask import Flask, redirect, render_template, url_for, request, flash, session
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import exists
 from flask_login import LoginManager, UserMixin, login_user
 import sqlite3
@@ -10,30 +9,41 @@ import datetime
 import sys
 import os
 
-
 file_dir = os.path.dirname(__file__)
 sys.path.append(file_dir)
 
 from config_operations import ConfigFile, home
 
+
 # config
-MY_STRAVA_CLIENT_ID = int(ConfigFile(home, 'config.yaml').read_parameter('MY_STRAVA_CLIENT_ID'))
-MY_STRAVA_SECRET = ConfigFile(home, 'config.yaml').read_parameter('MY_STRAVA_SECRET')
-REDIRECT_URI = ConfigFile(home, 'config.yaml').read_parameter('REDIRECT_URI')
-SECRET_KEY = ConfigFile(home, 'config.yaml').read_parameter('SECRET_KEY')
-DATABASE = ConfigFile(home, 'db_address.yaml').read_parameter('DB_ADDRESS')
+def get_config():
+    MY_STRAVA_CLIENT_ID = ConfigFile(home, 'config.yaml').read_parameter('MY_STRAVA_CLIENT_ID')
+    MY_STRAVA_SECRET = ConfigFile(home, 'config.yaml').read_parameter('MY_STRAVA_SECRET')
+    REDIRECT_URI = ConfigFile(home, 'config.yaml').read_parameter('REDIRECT_URI')
+    SECRET_KEY = ConfigFile(home, 'config.yaml').read_parameter('SECRET_KEY')
+    DATABASE = ConfigFile(home, 'db_address.yaml').read_parameter('DB_ADDRESS')
 
-user_token = sqlite3.connect(os.path.join(home, 'user_token.db'))
+    user_token = sqlite3.connect(os.path.join(home, 'user_token.db'))
 
-app = Flask(__name__)
-app.secret_key = SECRET_KEY
-app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    access_token = None
 
-db = SQLAlchemy(app)
+    config_parameters = {'MY_STRAVA_SECRET': MY_STRAVA_SECRET, 'MY_STRAVA_CLIENT_ID': MY_STRAVA_CLIENT_ID,
+                         'REDIRECT_URI': REDIRECT_URI, 'SECRET_KEY': SECRET_KEY, 'DATABASE': DATABASE,
+                         'user_token': user_token, 'access_token': access_token}
 
+    return config_parameters
+
+
+def create_app():
+    app = Flask(__name__)
+    app.secret_key = get_config()['SECRET_KEY']
+    app.config['SQLALCHEMY_DATABASE_URI'] = get_config()['DATABASE']
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    return app
+
+app = create_app()
+db = SQLAlchemy()
 strava_client = Client()
-access_token = None
 
 
 class User(db.Model, UserMixin):
@@ -74,6 +84,8 @@ def monday():
 @app.route('/authorize')
 def authorize():
     code = request.args.get('code')
+    MY_STRAVA_CLIENT_ID = get_config()['MY_STRAVA_CLIENT_ID']
+    MY_STRAVA_SECRET = get_config()['MY_STRAVA_SECRET']
     access_token = strava_client.exchange_code_for_token(client_id=MY_STRAVA_CLIENT_ID,
                                                          client_secret=MY_STRAVA_SECRET,
                                                          code=code)
@@ -89,7 +101,6 @@ def authorize():
     athlete = strava_client.get_athlete()
     user_token = User(user_id=athlete.id, username=athlete.firstname, access_token=access_token, cookies=cookies)
     user_cookies = db.session.query(User).get(athlete.id)
-    print('wrote data to db')
 
     user_exists = db.session.query(exists().where(User.user_id == athlete.id)).scalar()
 
@@ -105,6 +116,8 @@ def authorize():
 
 @app.route('/')
 def index():
+    MY_STRAVA_CLIENT_ID = get_config()['MY_STRAVA_CLIENT_ID']
+    REDIRECT_URI = get_config()['REDIRECT_URI']
     try:
         if session['logged_in']:
             authorize_url = strava_client.authorization_url(client_id=MY_STRAVA_CLIENT_ID,
@@ -147,10 +160,5 @@ login_manager.init_app(app)
 
 
 if __name__ == "__main__":
-    if '--setup' in sys.argv:
-        with app.app_context():
-            db.create_all()
-            db.session.commit()
-            print('Database tables created')
-    else:
-        app.run(host='0.0.0.0')
+    app = create_app()
+    app.run()
